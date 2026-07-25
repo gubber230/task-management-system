@@ -20,7 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import mate.academy.app.model.enums.ProjectStatus;
 
 @Entity
@@ -29,7 +28,6 @@ import mate.academy.app.model.enums.ProjectStatus;
 @Setter
 @ToString
 @NoArgsConstructor
-@Accessors(chain = true)
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,4 +52,20 @@ public class Project {
     )
     @ToString.Exclude
     private Set<User> users = new HashSet<>();
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Project project)) {
+            return false;
+        }
+        return id != null && id.equals(project.id);
+    }
 }
