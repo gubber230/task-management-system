@@ -2,24 +2,25 @@ package mate.academy.app.dto.external;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.Set;
-import mate.academy.app.model.enums.ProjectStatus;
+import mate.academy.app.model.enums.TaskPriority;
+import mate.academy.app.model.enums.TaskStatus;
 
-public record ProjectUpdateRequestDto(
+public record TaskUpdateRequestDto(
         @NotBlank
         @Size(max = 50)
         String name,
         @Size(max = 1000)
         String description,
-        @FutureOrPresent
-        LocalDate endDate,
         @NotNull
-        ProjectStatus status,
-        @NotEmpty
-        Set<Long> userIds
+        TaskPriority priority,
+        @NotNull
+        TaskStatus status,
+        @FutureOrPresent
+        LocalDate dueDate,
+        @NotNull
+        Long assigneeId
 ) {
 }

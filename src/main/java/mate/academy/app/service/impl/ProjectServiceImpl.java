@@ -2,7 +2,7 @@ package mate.academy.app.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.ProjectRequestDto;
+import mate.academy.app.dto.external.ProjectCreateRequestDto;
 import mate.academy.app.dto.external.ProjectResponseDto;
 import mate.academy.app.dto.external.ProjectUpdateRequestDto;
 import mate.academy.app.mapper.ProjectMapper;
@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +24,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public ProjectResponseDto create(ProjectRequestDto requestDto, Long ownerId) {
+    public ProjectResponseDto create(ProjectCreateRequestDto requestDto, Long ownerId) {
         Project savedProject = projectRepository.save(
                 projectMapper.toModel(requestDto, ownerId, userRepository));
         return projectMapper.toDto(savedProject);
@@ -34,7 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectResponseDto findById(Long projectId, Long userId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Project with Id " + projectId + " do not exist"));
+                        "Project with ID " + projectId + " does not exist"));
         checkAccessPermission(projectId, userId);
         return projectMapper.toDto(project);
     }
@@ -59,18 +62,20 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteById(projectId);
     }
 
-    private void checkAccessPermission(Long projectId, Long userId) {
-        if (!projectRepository.isProjectMember(projectId, userId)) {
+    @Override
+    public void checkOwnerPermission(Long projectId, Long ownerId) {
+        if (!projectRepository.isProjectOwner(projectId, ownerId)) {
             throw new AccessDeniedException(
-                    "You do not have a permission to interact with this project."
+                    "You do not have a permission to change this project."
                             + " Id: " + projectId);
         }
     }
 
-    private void checkOwnerPermission(Long projectId, Long ownerId) {
-        if (!projectRepository.isProjectOwner(projectId, ownerId)) {
+    @Override
+    public void checkAccessPermission(Long projectId, Long userId) {
+        if (!projectRepository.isProjectMember(projectId, userId)) {
             throw new AccessDeniedException(
-                    "You do not have a permission to change this project."
+                    "You do not have a permission to interact with this project."
                             + " Id: " + projectId);
         }
     }

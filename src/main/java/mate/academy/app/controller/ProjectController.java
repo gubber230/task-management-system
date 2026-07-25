@@ -3,8 +3,9 @@ package mate.academy.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.ProjectRequestDto;
+import mate.academy.app.dto.external.ProjectCreateRequestDto;
 import mate.academy.app.dto.external.ProjectResponseDto;
 import mate.academy.app.dto.external.ProjectUpdateRequestDto;
 import mate.academy.app.model.User;
@@ -22,13 +23,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Authentication", description = "Endpoints for managing projects")
+@Tag(name = "Project", description = "Endpoints for managing projects")
 @RequiredArgsConstructor
 @RestController
 @Validated
 @RequestMapping("/projects")
 public class ProjectController {
     private final ProjectService projectService;
+
+    @PostMapping
+    @Operation(summary = "Create a project")
+    public ProjectResponseDto createProject(
+            @AuthenticationPrincipal User user,
+            @RequestBody @Valid ProjectCreateRequestDto requestDto
+    ) {
+        return projectService.create(requestDto, user.getId());
+    }
 
     @GetMapping
     @Operation(summary = "Get current user accessible projects")
@@ -42,24 +52,15 @@ public class ProjectController {
     @Operation(summary = "Get user project by id")
     public ProjectResponseDto getProjects(
             @AuthenticationPrincipal User user,
-            @PathVariable Long projectId) {
+            @PathVariable @Min(0) Long projectId) {
         return projectService.findById(projectId, user.getId());
-    }
-
-    @PostMapping
-    @Operation(summary = "Create a project")
-    public ProjectResponseDto createProject(
-            @AuthenticationPrincipal User user,
-            @RequestBody @Valid ProjectRequestDto requestDto
-    ) {
-        return projectService.create(requestDto, user.getId());
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update projects name or description")
     public void updateProject(
             @AuthenticationPrincipal User user,
-            @PathVariable Long projectId,
+            @PathVariable @Min(0) Long projectId,
             @RequestBody @Valid ProjectUpdateRequestDto updateRequestDto
     ) {
         projectService.update(projectId, updateRequestDto, user.getId());
@@ -69,7 +70,7 @@ public class ProjectController {
     @Operation(summary = "Delete user project")
     public void deleteProject(
             @AuthenticationPrincipal User user,
-            @PathVariable Long projectId
+            @PathVariable @Min(0) Long projectId
     ) {
         projectService.delete(projectId, user.getId());
     }
