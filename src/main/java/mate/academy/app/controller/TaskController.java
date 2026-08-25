@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.TaskCreateRequestDto;
-import mate.academy.app.dto.external.TaskUpdateRequestDto;
-import mate.academy.app.dto.internal.TaskDto;
+import mate.academy.app.dto.request.TaskCreateRequestDto;
+import mate.academy.app.dto.request.TaskUpdateRequestDto;
+import mate.academy.app.dto.response.TaskResponseDto;
 import mate.academy.app.model.User;
 import mate.academy.app.service.TaskService;
 import org.springframework.data.domain.Page;
@@ -33,20 +33,20 @@ public class TaskController {
 
     @PostMapping
     @Operation(summary = "Create a task")
-    TaskDto createTask(@AuthenticationPrincipal User user,
-                       @RequestBody @Valid TaskCreateRequestDto taskRequestDto) {
+    TaskResponseDto createTask(@AuthenticationPrincipal User user,
+                               @RequestBody @Valid TaskCreateRequestDto taskRequestDto) {
         return taskService.create(taskRequestDto, user.getId());
     }
 
     @GetMapping
     @Operation(summary = "Get current user accessible tasks")
-    Page<TaskDto> getTasks(@AuthenticationPrincipal User user, Pageable pageable) {
+    Page<TaskResponseDto> getTasks(@AuthenticationPrincipal User user, Pageable pageable) {
         return taskService.findAll(user.getId(), pageable);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get task by id")
-    TaskDto getTask(@PathVariable @Min(0) Long taskId, @AuthenticationPrincipal User user) {
+    TaskResponseDto getTask(@PathVariable @Min(0) Long taskId, @AuthenticationPrincipal User user) {
         return taskService.findById(taskId, user.getId());
     }
 

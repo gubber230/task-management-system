@@ -1,8 +1,8 @@
-package mate.academy.app.dto.internal;
+package mate.academy.app.dto.response;
 
 import java.time.LocalDateTime;
 
-public record CommentDto(
+public record CommentResponseDto(
         Long id,
         Long taskId,
         Long userId,

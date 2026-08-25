@@ -1,20 +1,17 @@
-package mate.academy.app.dto.external;
+package mate.academy.app.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import mate.academy.app.model.enums.TaskPriority;
+import mate.academy.app.model.enums.TaskStatus;
 
-public record TaskCreateRequestDto(
-        @NotBlank
+public record TaskResponseDto(
+        Long id,
         String name,
         String description,
-        @NotNull
         TaskPriority priority,
+        TaskStatus status,
         LocalDate dueDate,
-        @NotNull
         Long projectId,
-        @NotNull
         Long assigneeId
 ) {
 }

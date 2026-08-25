@@ -1,4 +1,4 @@
-package mate.academy.app.dto.external;
+package mate.academy.app.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,9 +1,9 @@
 package mate.academy.app.mapper;
 
 import mate.academy.app.config.MapperConfig;
-import mate.academy.app.dto.external.TaskCreateRequestDto;
-import mate.academy.app.dto.external.TaskUpdateRequestDto;
-import mate.academy.app.dto.internal.TaskDto;
+import mate.academy.app.dto.request.TaskCreateRequestDto;
+import mate.academy.app.dto.request.TaskUpdateRequestDto;
+import mate.academy.app.dto.response.TaskResponseDto;
 import mate.academy.app.model.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,7 +15,7 @@ public interface TaskMapper {
     @Mapping(target = "status", constant = "NOT_STARTED")
     Task toModel(TaskCreateRequestDto requestDto);
 
-    TaskDto toDto(Task task);
+    TaskResponseDto toDto(Task task);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "projectId", ignore = true)
