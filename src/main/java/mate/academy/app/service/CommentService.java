@@ -1,12 +1,12 @@
 package mate.academy.app.service;
 
-import mate.academy.app.dto.external.CommentCreateRequestDto;
-import mate.academy.app.dto.internal.CommentDto;
+import mate.academy.app.dto.request.CommentCreateRequestDto;
+import mate.academy.app.dto.response.CommentResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CommentService {
-    CommentDto create(CommentCreateRequestDto requestDto);
+    CommentResponseDto create(CommentCreateRequestDto requestDto);
 
-    Page<CommentDto> getAllByTaskId(Long taskId, Pageable pageable);
+    Page<CommentResponseDto> getAllByTaskId(Long taskId, Pageable pageable);
 }

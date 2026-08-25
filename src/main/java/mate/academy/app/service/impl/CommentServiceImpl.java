@@ -1,8 +1,8 @@
 package mate.academy.app.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.CommentCreateRequestDto;
-import mate.academy.app.dto.internal.CommentDto;
+import mate.academy.app.dto.request.CommentCreateRequestDto;
+import mate.academy.app.dto.response.CommentResponseDto;
 import mate.academy.app.mapper.CommentMapper;
 import mate.academy.app.model.Comment;
 import mate.academy.app.repository.CommentRepository;
@@ -20,13 +20,13 @@ public class CommentServiceImpl implements CommentService {
     private final TaskService taskService;
 
     @Override
-    public CommentDto create(CommentCreateRequestDto requestDto) {
+    public CommentResponseDto create(CommentCreateRequestDto requestDto) {
         Comment model = commentMapper.toModel(requestDto);
         return commentMapper.toDto(model);
     }
 
     @Override
-    public Page<CommentDto> getAllByTaskId(Long taskId, Pageable pageable) {
+    public Page<CommentResponseDto> getAllByTaskId(Long taskId, Pageable pageable) {
         return commentRepository.findAllByTaskId(taskId, pageable)
                 .map(commentMapper::toDto);
     }

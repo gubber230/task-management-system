@@ -2,8 +2,8 @@ package mate.academy.app.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.CommentCreateRequestDto;
-import mate.academy.app.dto.internal.CommentDto;
+import mate.academy.app.dto.request.CommentCreateRequestDto;
+import mate.academy.app.dto.response.CommentResponseDto;
 import mate.academy.app.service.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,12 +24,12 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    CommentDto createComment(@RequestBody CommentCreateRequestDto requestDto) {
+    CommentResponseDto createComment(@RequestBody CommentCreateRequestDto requestDto) {
         return commentService.create(requestDto);
     }
 
     @GetMapping
-    Page<CommentDto> getComments(
+    Page<CommentResponseDto> getComments(
             @RequestParam("taskId") Long taskId,
             Pageable pageable
     ) {

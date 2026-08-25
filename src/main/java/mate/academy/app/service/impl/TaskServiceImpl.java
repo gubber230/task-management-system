@@ -2,9 +2,9 @@ package mate.academy.app.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.TaskCreateRequestDto;
-import mate.academy.app.dto.external.TaskUpdateRequestDto;
-import mate.academy.app.dto.internal.TaskDto;
+import mate.academy.app.dto.request.TaskCreateRequestDto;
+import mate.academy.app.dto.request.TaskUpdateRequestDto;
+import mate.academy.app.dto.response.TaskResponseDto;
 import mate.academy.app.mapper.TaskMapper;
 import mate.academy.app.model.Task;
 import mate.academy.app.repository.TaskRepository;
@@ -12,6 +12,7 @@ import mate.academy.app.service.ProjectService;
 import mate.academy.app.service.TaskService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,24 +23,24 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper;
 
     @Override
-    public TaskDto create(TaskCreateRequestDto requestDto, Long ownerId) {
-        projectService.checkOwnerPermission(requestDto.projectId(), ownerId);
+    public TaskResponseDto create(TaskCreateRequestDto requestDto, Long ownerId) {
+        projectService.checkProjectOwnerPermission(requestDto.projectId(), ownerId);
         Task savedTask = taskRepository.save(taskMapper.toModel(requestDto));
         return taskMapper.toDto(savedTask);
     }
 
     @Override
-    public Page<TaskDto> findAll(Long userId, Pageable pageable) {
+    public Page<TaskResponseDto> findAll(Long userId, Pageable pageable) {
         return taskRepository.findAllByAssigneeId(userId, pageable)
                 .map(taskMapper::toDto);
     }
 
     @Override
-    public TaskDto findById(Long taskId, Long userId) {
+    public TaskResponseDto findById(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new EntityNotFoundException(
                 "Task with ID " + taskId + " does not exist"
         ));
-        projectService.checkAccessPermission(task.getProjectId(), userId);
+        projectService.checkProjectAccessPermission(task.getProjectId(), userId);
         return taskMapper.toDto(task);
     }
 
@@ -58,7 +59,16 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new EntityNotFoundException(
                 "Task with ID " + taskId + " does not exist"
         ));
-        projectService.checkOwnerPermission(taskToDelete.getProjectId(), userId);
+        projectService.checkProjectOwnerPermission(taskToDelete.getProjectId(), userId);
         taskRepository.delete(taskToDelete);
+    }
+
+    @Override
+    public void checkTaskAccessPermission(Long taskId, Long userId) {
+        projectService.checkProjectAccessPermission(
+                taskRepository.findProjectIdById(taskId).orElseThrow(
+                        () -> new AccessDeniedException(
+                                "You do not have permission to interact with this task.")),
+                userId);
     }
 }

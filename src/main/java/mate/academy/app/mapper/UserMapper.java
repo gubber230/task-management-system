@@ -1,9 +1,8 @@
 package mate.academy.app.mapper;
 
 import mate.academy.app.config.MapperConfig;
-import mate.academy.app.dto.external.UserRegistrationRequestDto;
-import mate.academy.app.dto.external.UserRegistrationResponseDto;
-import mate.academy.app.dto.internal.UserDto;
+import mate.academy.app.dto.request.UserRegistrationRequestDto;
+import mate.academy.app.dto.response.UserRegistrationResponseDto;
 import mate.academy.app.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +16,4 @@ public interface UserMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     User toEntity(UserRegistrationRequestDto requestDto);
-
-    UserDto toDto(User user);
 }

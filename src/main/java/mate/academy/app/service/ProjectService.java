@@ -1,8 +1,8 @@
 package mate.academy.app.service;
 
-import mate.academy.app.dto.external.ProjectCreateRequestDto;
-import mate.academy.app.dto.external.ProjectResponseDto;
-import mate.academy.app.dto.external.ProjectUpdateRequestDto;
+import mate.academy.app.dto.request.ProjectCreateRequestDto;
+import mate.academy.app.dto.request.ProjectUpdateRequestDto;
+import mate.academy.app.dto.response.ProjectResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +17,7 @@ public interface ProjectService {
 
     void delete(Long projectId, Long ownerId);
 
-    void checkOwnerPermission(Long projectId, Long ownerId);
+    void checkProjectOwnerPermission(Long projectId, Long ownerId);
 
-    void checkAccessPermission(Long projectId, Long userId);
+    void checkProjectAccessPermission(Long projectId, Long userId);
 }

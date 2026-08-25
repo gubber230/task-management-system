@@ -2,9 +2,9 @@ package mate.academy.app.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import mate.academy.app.dto.external.ProjectCreateRequestDto;
-import mate.academy.app.dto.external.ProjectResponseDto;
-import mate.academy.app.dto.external.ProjectUpdateRequestDto;
+import mate.academy.app.dto.request.ProjectCreateRequestDto;
+import mate.academy.app.dto.request.ProjectUpdateRequestDto;
+import mate.academy.app.dto.response.ProjectResponseDto;
 import mate.academy.app.mapper.ProjectMapper;
 import mate.academy.app.model.Project;
 import mate.academy.app.repository.ProjectRepository;
@@ -38,7 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Project with ID " + projectId + " does not exist"));
-        checkAccessPermission(projectId, userId);
+        checkProjectAccessPermission(projectId, userId);
         return projectMapper.toDto(project);
     }
 
@@ -50,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void update(Long projectId, ProjectUpdateRequestDto updateRequestDto, Long ownerId) {
-        checkOwnerPermission(projectId, ownerId);
+        checkProjectOwnerPermission(projectId, ownerId);
         Project project = projectRepository.getReferenceById(projectId);
         projectMapper.update(project, updateRequestDto, userRepository);
         projectRepository.save(project);
@@ -58,12 +58,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void delete(Long projectId, Long ownerId) {
-        checkOwnerPermission(projectId, ownerId);
+        checkProjectOwnerPermission(projectId, ownerId);
         projectRepository.deleteById(projectId);
     }
 
     @Override
-    public void checkOwnerPermission(Long projectId, Long ownerId) {
+    public void checkProjectOwnerPermission(Long projectId, Long ownerId) {
         if (!projectRepository.isProjectOwner(projectId, ownerId)) {
             throw new AccessDeniedException(
                     "You do not have a permission to change this project."
@@ -72,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void checkAccessPermission(Long projectId, Long userId) {
+    public void checkProjectAccessPermission(Long projectId, Long userId) {
         if (!projectRepository.isProjectMember(projectId, userId)) {
             throw new AccessDeniedException(
                     "You do not have a permission to interact with this project."

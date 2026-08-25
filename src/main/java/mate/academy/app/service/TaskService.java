@@ -1,19 +1,21 @@
 package mate.academy.app.service;
 
-import mate.academy.app.dto.external.TaskCreateRequestDto;
-import mate.academy.app.dto.external.TaskUpdateRequestDto;
-import mate.academy.app.dto.internal.TaskDto;
+import mate.academy.app.dto.request.TaskCreateRequestDto;
+import mate.academy.app.dto.request.TaskUpdateRequestDto;
+import mate.academy.app.dto.response.TaskResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
-    TaskDto create(TaskCreateRequestDto requestDto, Long ownerId);
+    TaskResponseDto create(TaskCreateRequestDto requestDto, Long ownerId);
 
-    Page<TaskDto> findAll(Long userId, Pageable pageable);
+    Page<TaskResponseDto> findAll(Long userId, Pageable pageable);
 
-    TaskDto findById(Long taskId, Long userId);
+    TaskResponseDto findById(Long taskId, Long userId);
 
     void update(Long taskId, TaskUpdateRequestDto updateDto, Long userId);
 
     void delete(Long taskId, Long userId);
+
+    void checkTaskAccessPermission(Long taskId, Long userId);
 }

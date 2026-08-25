@@ -1,8 +1,8 @@
 package mate.academy.app.mapper;
 
 import mate.academy.app.config.MapperConfig;
-import mate.academy.app.dto.external.CommentCreateRequestDto;
-import mate.academy.app.dto.internal.CommentDto;
+import mate.academy.app.dto.request.CommentCreateRequestDto;
+import mate.academy.app.dto.response.CommentResponseDto;
 import mate.academy.app.model.Comment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,5 +13,5 @@ public interface CommentMapper {
     @Mapping(target = "timeStamp", expression = "java(java.time.LocalDateTime.now())")
     Comment toModel(CommentCreateRequestDto requestDto);
 
-    CommentDto toDto(Comment comment);
+    CommentResponseDto toDto(Comment comment);
 }

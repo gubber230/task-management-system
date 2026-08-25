@@ -1,4 +1,4 @@
-package mate.academy.app.dto.external;
+package mate.academy.app.dto.request;
 
 public record CommentCreateRequestDto(
         Long taskId,

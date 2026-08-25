@@ -2,10 +2,11 @@ package mate.academy.app.mapper;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import mate.academy.app.config.MapperConfig;
-import mate.academy.app.dto.external.ProjectCreateRequestDto;
-import mate.academy.app.dto.external.ProjectResponseDto;
-import mate.academy.app.dto.external.ProjectUpdateRequestDto;
+import mate.academy.app.dto.request.ProjectCreateRequestDto;
+import mate.academy.app.dto.request.ProjectUpdateRequestDto;
+import mate.academy.app.dto.response.ProjectResponseDto;
 import mate.academy.app.model.Project;
 import mate.academy.app.model.User;
 import mate.academy.app.repository.UserRepository;
@@ -26,6 +27,8 @@ public interface ProjectMapper {
             ProjectCreateRequestDto requestDto, Long ownerId,
             @Context UserRepository userRepository);
 
+    @Mapping(target = "ownerId", source = "owner.id")
+    @Mapping(target = "userIds", source = "users", qualifiedByName = "toUserIds")
     ProjectResponseDto toDto(Project project);
 
     @Mapping(target = "id", ignore = true)
@@ -42,10 +45,17 @@ public interface ProjectMapper {
     }
 
     @Named("toUsers")
-    default Set<User> idToUsers(Set<Long> userIds, @Context UserRepository userRepository) {
+    default Set<User> idsToUsers(Set<Long> userIds, @Context UserRepository userRepository) {
         if (userIds == null) {
             return new HashSet<>();
         }
         return new HashSet<>(userRepository.findAllById(userIds));
+    }
+
+    @Named("toUserIds")
+    default Set<Long> usersToIds(Set<User> users) {
+        return users.stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
     }
 }

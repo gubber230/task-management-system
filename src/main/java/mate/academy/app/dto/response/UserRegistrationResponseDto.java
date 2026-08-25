@@ -1,6 +1,6 @@
-package mate.academy.app.dto.internal;
+package mate.academy.app.dto.response;
 
-public record UserDto(
+public record UserRegistrationResponseDto(
         Long id,
         String username,
         String email,
