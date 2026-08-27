@@ -1,17 +1,21 @@
 package mate.academy.app.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import mate.academy.app.dto.internal.TaskSearchParameters;
 import mate.academy.app.dto.request.TaskCreateRequestDto;
 import mate.academy.app.dto.request.TaskUpdateRequestDto;
 import mate.academy.app.dto.response.TaskResponseDto;
 import mate.academy.app.mapper.TaskMapper;
 import mate.academy.app.model.Task;
 import mate.academy.app.repository.TaskRepository;
+import mate.academy.app.repository.task.TaskSpecificationBuilder;
 import mate.academy.app.service.ProjectService;
 import mate.academy.app.service.TaskService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final ProjectService projectService;
     private final TaskMapper taskMapper;
+    private final TaskSpecificationBuilder specificationBuilder;
 
     @Override
     public TaskResponseDto create(TaskCreateRequestDto requestDto, Long ownerId) {
@@ -57,10 +62,19 @@ public class TaskServiceImpl implements TaskService {
     public void delete(Long taskId, Long userId) {
         Task taskToDelete = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                "Task with ID " + taskId + " does not exist"
-        ));
+                        "Task with ID " + taskId + " does not exist"
+                ));
         projectService.checkProjectOwnerPermission(taskToDelete.getProjectId(), userId);
         taskRepository.delete(taskToDelete);
+    }
+
+    @Override
+    public List<TaskResponseDto> search(TaskSearchParameters searchParameters, Long userId) {
+        Specification<Task> specification = specificationBuilder.build(searchParameters);
+        return taskRepository.findAll(specification)
+                .stream()
+                .map(taskMapper::toDto)
+                .toList();
     }
 
     @Override

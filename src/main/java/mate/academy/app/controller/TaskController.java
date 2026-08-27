@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import mate.academy.app.dto.internal.TaskSearchParameters;
 import mate.academy.app.dto.request.TaskCreateRequestDto;
 import mate.academy.app.dto.request.TaskUpdateRequestDto;
 import mate.academy.app.dto.response.TaskResponseDto;
@@ -62,5 +64,12 @@ public class TaskController {
     @Operation(summary = "Delete task")
     void deleteTask(@PathVariable @Min(0) Long id, @AuthenticationPrincipal User user) {
         taskService.delete(id, user.getId());
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Sort tasks by parameters")
+    public List<TaskResponseDto> search(TaskSearchParameters searchParameters,
+                                        @AuthenticationPrincipal User user) {
+        return taskService.search(searchParameters, user.getId());
     }
 }

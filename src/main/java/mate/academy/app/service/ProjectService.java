@@ -1,5 +1,7 @@
 package mate.academy.app.service;
 
+import java.util.List;
+import mate.academy.app.dto.internal.ProjectSearchParameters;
 import mate.academy.app.dto.request.ProjectCreateRequestDto;
 import mate.academy.app.dto.request.ProjectUpdateRequestDto;
 import mate.academy.app.dto.response.ProjectResponseDto;
@@ -16,6 +18,8 @@ public interface ProjectService {
     void update(Long projectId, ProjectUpdateRequestDto updateRequestDto, Long ownerId);
 
     void delete(Long projectId, Long ownerId);
+
+    List<ProjectResponseDto> search(ProjectSearchParameters searchParameters, Long userId);
 
     void checkProjectOwnerPermission(Long projectId, Long ownerId);
 
