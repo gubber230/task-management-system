@@ -1,7 +1,9 @@
 package mate.academy.app.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import mate.academy.app.dto.internal.ProjectSearchParameters;
 import mate.academy.app.dto.request.ProjectCreateRequestDto;
 import mate.academy.app.dto.request.ProjectUpdateRequestDto;
 import mate.academy.app.dto.response.ProjectResponseDto;
@@ -9,9 +11,11 @@ import mate.academy.app.mapper.ProjectMapper;
 import mate.academy.app.model.Project;
 import mate.academy.app.repository.ProjectRepository;
 import mate.academy.app.repository.UserRepository;
+import mate.academy.app.repository.project.ProjectSpecificationBuilder;
 import mate.academy.app.service.ProjectService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,6 +27,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ProjectSpecificationBuilder projectSpecificationBuilder;
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
@@ -60,6 +65,16 @@ public class ProjectServiceImpl implements ProjectService {
     public void delete(Long projectId, Long ownerId) {
         checkProjectOwnerPermission(projectId, ownerId);
         projectRepository.deleteById(projectId);
+    }
+
+    @Override
+    public List<ProjectResponseDto> search(ProjectSearchParameters searchParameters, Long userId) {
+        Specification<Project> specification = projectSpecificationBuilder
+                .build(searchParameters);
+        return projectRepository.findAll(specification)
+                .stream()
+                .map(projectMapper::toDto)
+                .toList();
     }
 
     @Override

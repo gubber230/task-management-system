@@ -1,5 +1,7 @@
 package mate.academy.app.service;
 
+import java.util.List;
+import mate.academy.app.dto.internal.TaskSearchParameters;
 import mate.academy.app.dto.request.TaskCreateRequestDto;
 import mate.academy.app.dto.request.TaskUpdateRequestDto;
 import mate.academy.app.dto.response.TaskResponseDto;
@@ -16,6 +18,8 @@ public interface TaskService {
     void update(Long taskId, TaskUpdateRequestDto updateDto, Long userId);
 
     void delete(Long taskId, Long userId);
+
+    List<TaskResponseDto> search(TaskSearchParameters searchParameters, Long userId);
 
     void checkTaskAccessPermission(Long taskId, Long userId);
 }

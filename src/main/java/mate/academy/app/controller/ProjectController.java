@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import mate.academy.app.dto.internal.ProjectSearchParameters;
 import mate.academy.app.dto.request.ProjectCreateRequestDto;
 import mate.academy.app.dto.request.ProjectUpdateRequestDto;
 import mate.academy.app.dto.response.ProjectResponseDto;
@@ -73,5 +75,12 @@ public class ProjectController {
             @PathVariable @Min(0) Long projectId
     ) {
         projectService.delete(projectId, user.getId());
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Sort projects by parameters")
+    public List<ProjectResponseDto> search(ProjectSearchParameters searchParameters,
+                                           @AuthenticationPrincipal User user) {
+        return projectService.search(searchParameters, user.getId());
     }
 }

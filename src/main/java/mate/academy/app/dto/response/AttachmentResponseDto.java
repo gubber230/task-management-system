@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public record AttachmentResponseDto(
         Long id,
         Long taskId,
-        String DropboxFileId,
+        String dropboxFileId,
         String fileName,
         LocalDateTime uploadDate
 ) {
