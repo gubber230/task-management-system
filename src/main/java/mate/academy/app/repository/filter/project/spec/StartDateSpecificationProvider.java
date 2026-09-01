@@ -1,22 +1,22 @@
-package mate.academy.app.repository.project.spec;
+package mate.academy.app.repository.filter.project.spec;
 
 import mate.academy.app.dto.internal.ProjectSearchParameters;
 import mate.academy.app.model.Project;
-import mate.academy.app.repository.SpecificationProvider;
+import mate.academy.app.repository.filter.SpecificationProvider;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EndDateSpecificationProvider
+public class StartDateSpecificationProvider
         implements SpecificationProvider<Project, ProjectSearchParameters> {
     @Override
     public String getKey() {
-        return "endDate";
+        return "startDate";
     }
 
-    @Override
     public Specification<Project> getSpecification(ProjectSearchParameters param) {
         return (root, query, criteriaBuilder)
-                -> criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), param.getEndDate());
+                -> criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"),
+                param.getStartDate());
     }
 }

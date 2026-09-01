@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Set;
 import mate.academy.app.model.enums.TaskPriority;
 import mate.academy.app.model.enums.TaskStatus;
 
@@ -21,6 +22,8 @@ public record TaskUpdateRequestDto(
         @FutureOrPresent
         LocalDate dueDate,
         @NotNull
-        Long assigneeId
+        Long assigneeId,
+        @NotNull
+        Set<Long> labelIds
 ) {
 }

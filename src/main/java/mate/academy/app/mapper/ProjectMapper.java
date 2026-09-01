@@ -21,31 +21,24 @@ public interface ProjectMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "startDate", expression = "java(java.time.LocalDate.now())")
     @Mapping(target = "status", constant = "INITIATED")
-    @Mapping(source = "ownerId", target = "owner", qualifiedByName = "toUser")
     @Mapping(source = "requestDto.userIds", target = "users", qualifiedByName = "toUsers")
     Project toModel(
             ProjectCreateRequestDto requestDto, Long ownerId,
             @Context UserRepository userRepository);
 
-    @Mapping(target = "ownerId", source = "owner.id")
     @Mapping(target = "userIds", source = "users", qualifiedByName = "toUserIds")
     ProjectResponseDto toDto(Project project);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "startDate", ignore = true)
-    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "ownerId", ignore = true)
     @Mapping(target = "users", source = "userIds", qualifiedByName = "toUsers")
     void update(@MappingTarget Project oldProject,
                 ProjectUpdateRequestDto updateRequestDto,
                 @Context UserRepository userRepository);
 
-    @Named("toUser")
-    default User idToUser(Long userId, @Context UserRepository userRepository) {
-        return userRepository.getReferenceById(userId);
-    }
-
     @Named("toUsers")
-    default Set<User> idsToUsers(Set<Long> userIds, @Context UserRepository userRepository) {
+    default Set<User> toUsers(Set<Long> userIds, @Context UserRepository userRepository) {
         if (userIds == null) {
             return new HashSet<>();
         }

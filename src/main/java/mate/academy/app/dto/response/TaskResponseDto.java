@@ -1,6 +1,7 @@
 package mate.academy.app.dto.response;
 
 import java.time.LocalDate;
+import java.util.Set;
 import mate.academy.app.model.enums.TaskPriority;
 import mate.academy.app.model.enums.TaskStatus;
 
@@ -12,6 +13,7 @@ public record TaskResponseDto(
         TaskStatus status,
         LocalDate dueDate,
         Long projectId,
-        Long assigneeId
+        Long assigneeId,
+        Set<LabelResponseDto> labelResponseDtoSet
 ) {
 }

@@ -1,4 +1,4 @@
-package mate.academy.app.repository;
+package mate.academy.app.repository.filter;
 
 import mate.academy.app.dto.internal.SearchParameters;
 import org.springframework.data.jpa.domain.Specification;

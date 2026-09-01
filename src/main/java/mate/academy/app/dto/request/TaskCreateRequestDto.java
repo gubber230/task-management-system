@@ -3,6 +3,7 @@ package mate.academy.app.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Set;
 import mate.academy.app.model.enums.TaskPriority;
 
 public record TaskCreateRequestDto(
@@ -15,6 +16,7 @@ public record TaskCreateRequestDto(
         @NotNull
         Long projectId,
         @NotNull
-        Long assigneeId
+        Long assigneeId,
+        Set<Long> labelIds
 ) {
 }

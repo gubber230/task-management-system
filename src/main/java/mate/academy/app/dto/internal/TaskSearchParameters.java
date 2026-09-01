@@ -14,4 +14,5 @@ public class TaskSearchParameters extends SearchParameters {
     private TaskStatus[] statuses;
     private TaskPriority[] priorities;
     private LocalDate dueDate;
+    private Long[] labelIds;
 }
