@@ -1,10 +1,10 @@
-package mate.academy.app.repository.project;
+package mate.academy.app.repository.filter.project;
 
 import lombok.RequiredArgsConstructor;
 import mate.academy.app.dto.internal.ProjectSearchParameters;
 import mate.academy.app.model.Project;
-import mate.academy.app.repository.SpecificationBuilder;
-import mate.academy.app.repository.SpecificationProviderManager;
+import mate.academy.app.repository.filter.SpecificationBuilder;
+import mate.academy.app.repository.filter.SpecificationProviderManager;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 

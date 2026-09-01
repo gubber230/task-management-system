@@ -1,17 +1,17 @@
 package mate.academy.app.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mate.academy.app.dto.internal.ProjectSearchParameters;
 import mate.academy.app.dto.request.ProjectCreateRequestDto;
 import mate.academy.app.dto.request.ProjectUpdateRequestDto;
 import mate.academy.app.dto.response.ProjectResponseDto;
+import mate.academy.app.exception.EntityNotFoundException;
 import mate.academy.app.mapper.ProjectMapper;
 import mate.academy.app.model.Project;
 import mate.academy.app.repository.ProjectRepository;
 import mate.academy.app.repository.UserRepository;
-import mate.academy.app.repository.project.ProjectSpecificationBuilder;
+import mate.academy.app.repository.filter.project.ProjectSpecificationBuilder;
 import mate.academy.app.service.ProjectService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +49,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Page<ProjectResponseDto> findAll(Long userId, Pageable pageable) {
-        return projectRepository.findAllByUserId(userId, pageable)
+        return projectRepository.findDistinctByOwnerIdOrUsersId(userId, userId, pageable)
                 .map(projectMapper::toDto);
     }
 
@@ -79,7 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void checkProjectOwnerPermission(Long projectId, Long ownerId) {
-        if (!projectRepository.isProjectOwner(projectId, ownerId)) {
+        if (!projectRepository.existsByIdAndOwnerId(projectId, ownerId)) {
             throw new AccessDeniedException(
                     "You do not have a permission to change this project."
                             + " Id: " + projectId);
@@ -88,7 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void checkProjectAccessPermission(Long projectId, Long userId) {
-        if (!projectRepository.isProjectMember(projectId, userId)) {
+        if (!projectRepository.existsByIdAndUserIsMember(projectId, userId)) {
             throw new AccessDeniedException(
                     "You do not have a permission to interact with this project."
                             + " Id: " + projectId);

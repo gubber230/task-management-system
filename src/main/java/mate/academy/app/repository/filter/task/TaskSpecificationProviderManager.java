@@ -1,11 +1,11 @@
-package mate.academy.app.repository.task;
+package mate.academy.app.repository.filter.task;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mate.academy.app.dto.internal.TaskSearchParameters;
 import mate.academy.app.model.Task;
-import mate.academy.app.repository.SpecificationProvider;
-import mate.academy.app.repository.SpecificationProviderManager;
+import mate.academy.app.repository.filter.SpecificationProvider;
+import mate.academy.app.repository.filter.SpecificationProviderManager;
 import org.springframework.stereotype.Component;
 
 @Component

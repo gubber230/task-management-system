@@ -1,10 +1,10 @@
-package mate.academy.app.repository.task;
+package mate.academy.app.repository.filter.task;
 
 import lombok.RequiredArgsConstructor;
 import mate.academy.app.dto.internal.TaskSearchParameters;
 import mate.academy.app.model.Task;
-import mate.academy.app.repository.SpecificationBuilder;
-import mate.academy.app.repository.SpecificationProviderManager;
+import mate.academy.app.repository.filter.SpecificationBuilder;
+import mate.academy.app.repository.filter.SpecificationProviderManager;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +42,11 @@ public class TaskSpecificationBuilder
 
         if (searchParameters.getDueDate() != null) {
             spec = spec.and(spManager.getSpecificationProvider("dueDate")
+                    .getSpecification(searchParameters));
+        }
+
+        if (searchParameters.getLabelIds() != null && searchParameters.getLabelIds().length > 0) {
+            spec = spec.and(spManager.getSpecificationProvider("labelIds")
                     .getSpecification(searchParameters));
         }
 

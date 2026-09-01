@@ -10,22 +10,16 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>,
         JpaSpecificationExecutor<Project> {
+    boolean existsByIdAndOwnerId(Long id, Long ownerId);
+
     @Query("SELECT COUNT(p) > 0 "
             + "FROM Project p "
             + "LEFT JOIN p.users u "
             + "WHERE p.id = :projectId "
-            + "AND (p.owner.id = :userId OR u.id = :userId)")
-    boolean isProjectMember(@Param("projectId") Long projectId, @Param("userId") Long userId);
+            + "AND (p.ownerId = :userId OR u.id = :userId)")
+    boolean existsByIdAndUserIsMember(@Param("projectId") Long projectId,
+                                      @Param("userId") Long userId);
 
-    @Query("SELECT DISTINCT p "
-            + "FROM Project p "
-            + "LEFT JOIN p.users u "
-            + "WHERE p.owner.id = :userId OR u.id = :userId")
-    Page<Project> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
+    Page<Project> findDistinctByOwnerIdOrUsersId(Long ownerId, Long userId, Pageable pageable);
 
-    @Query("SELECT COUNT(p) > 0 "
-            + "FROM Project p "
-            + "WHERE p.id = :projectId "
-            + "AND p.owner.id = :ownerId")
-    boolean isProjectOwner(@Param("projectId") Long projectId, @Param("ownerId") Long ownerId);
 }

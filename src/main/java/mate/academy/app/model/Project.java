@@ -11,11 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,8 +26,9 @@ import mate.academy.app.model.enums.ProjectStatus;
 @Table(name = "projects")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
+@ToString(exclude = {"users"})
+@EqualsAndHashCode(exclude = {"users"})
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,31 +42,13 @@ public class Project {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    @Column(nullable = false)
+    private Long ownerId;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "projects_users",
             joinColumns = @JoinColumn(name = "projects_id"),
             inverseJoinColumns = @JoinColumn(name = "users_id")
     )
-    @ToString.Exclude
     private Set<User> users = new HashSet<>();
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Project project)) {
-            return false;
-        }
-        return id != null && id.equals(project.id);
-    }
 }

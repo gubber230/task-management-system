@@ -1,22 +1,22 @@
-package mate.academy.app.repository.task.spec;
+package mate.academy.app.repository.filter.project.spec;
 
 import java.util.Arrays;
-import mate.academy.app.dto.internal.TaskSearchParameters;
-import mate.academy.app.model.Task;
-import mate.academy.app.repository.SpecificationProvider;
+import mate.academy.app.dto.internal.ProjectSearchParameters;
+import mate.academy.app.model.Project;
+import mate.academy.app.repository.filter.SpecificationProvider;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NameSpecificationProvider
-        implements SpecificationProvider<Task, TaskSearchParameters> {
+        implements SpecificationProvider<Project, ProjectSearchParameters> {
     @Override
     public String getKey() {
         return "name";
     }
 
     @Override
-    public Specification<Task> getSpecification(TaskSearchParameters param) {
+    public Specification<Project> getSpecification(ProjectSearchParameters param) {
         return (root, query, criteriaBuilder)
                 -> root.get("name").in(Arrays.asList(param.getNames()));
 
