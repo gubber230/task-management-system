@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,6 +31,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,7 +40,7 @@ import tools.jackson.databind.ObjectMapper;
 class LabelControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext webApplicationContext;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -50,11 +53,16 @@ class LabelControllerTest {
     @MockitoBean
     private NotificationService notificationService;
 
+    private MockMvc mockMvc;
     private final Long labelId = 1L;
     private LabelResponseDto responseDto;
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
+
         responseDto = new LabelResponseDto(labelId, "Bug", "#FF0000");
     }
 
@@ -81,6 +89,17 @@ class LabelControllerTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .with(csrf()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void create_Unauthenticated_ReturnsUnauthorized() throws Exception {
+        LabelRequestDto requestDto = new LabelRequestDto("Bug", "#FF0000");
+
+        mockMvc.perform(post("/labels")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -97,7 +116,7 @@ class LabelControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser
     void getAll_ValidPageable_ReturnsPageOfLabels() throws Exception {
         Page<LabelResponseDto> page = new PageImpl<>(List.of(responseDto));
 
@@ -130,7 +149,7 @@ class LabelControllerTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateDto))
                         .with(csrf()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -146,6 +165,6 @@ class LabelControllerTest {
     @WithMockUser(roles = "USER")
     void delete_AsNonAdmin_ReturnsForbidden() throws Exception {
         mockMvc.perform(delete("/labels/{id}", labelId).with(csrf()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 }

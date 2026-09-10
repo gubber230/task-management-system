@@ -48,7 +48,8 @@ public class TaskController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get task by id")
-    TaskResponseDto getTask(@PathVariable("id") @Min(0) Long taskId, @AuthenticationPrincipal User user) {
+    TaskResponseDto getTask(@PathVariable("id") @Min(0) Long taskId,
+                            @AuthenticationPrincipal User user) {
         return taskService.findById(taskId, user.getId());
     }
 

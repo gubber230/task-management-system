@@ -2,6 +2,7 @@ package mate.academy.app.controller;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,15 +30,19 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 class AuthentificationControllerTest {
+
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext webApplicationContext;
     @Autowired
     private ObjectMapper objectMapper;
+
     @MockitoBean
     private UserService userService;
     @MockitoBean
@@ -49,11 +54,16 @@ class AuthentificationControllerTest {
     @MockitoBean
     private NotificationService notificationService;
 
+    private MockMvc mockMvc;
     private UserRegistrationRequestDto registrationRequestDto;
     private UserLoginRequestDto loginRequestDto;
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
+
         registrationRequestDto = new UserRegistrationRequestDto(
                 "john_doe", "password123", "password123",
                 "john@example.com", "John", "Doe");
@@ -157,8 +167,8 @@ class AuthentificationControllerTest {
     }
 
     @Test
-    void getAll_Unauthenticated_ReturnsUnauthorizedOrForbidden() throws Exception {
+    void getAll_Unauthenticated_ReturnsForbidden() throws Exception {
         mockMvc.perform(get("/auth"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isForbidden());
     }
 }

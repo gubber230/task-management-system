@@ -27,7 +27,8 @@ public class CustomGlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleEntityNotFoundException(EntityNotFoundException ex) {
+    public ResponseEntity<ErrorResponseDto> handleEntityNotFoundException(
+            EntityNotFoundException ex) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponseDto error = new ErrorResponseDto(
                 LocalDateTime.now(),
@@ -39,7 +40,8 @@ public class CustomGlobalExceptionHandler {
     }
 
     @ExceptionHandler(RegistrationException.class)
-    public ResponseEntity<ErrorResponseDto> handleRegistrationException(RegistrationException ex) {
+    public ResponseEntity<ErrorResponseDto> handleRegistrationException(
+            RegistrationException ex) {
         HttpStatus status = HttpStatus.CONFLICT;
         ErrorResponseDto error = new ErrorResponseDto(
                 LocalDateTime.now(),
@@ -51,7 +53,8 @@ public class CustomGlobalExceptionHandler {
     }
 
     @ExceptionHandler(FileOperationException.class)
-    public ResponseEntity<ErrorResponseDto> handleFileOperationException(FileOperationException ex) {
+    public ResponseEntity<ErrorResponseDto> handleFileOperationException(
+            FileOperationException ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponseDto error = new ErrorResponseDto(
                 LocalDateTime.now(),
@@ -63,7 +66,8 @@ public class CustomGlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponseDto error = new ErrorResponseDto(
                 LocalDateTime.now(),
@@ -75,7 +79,8 @@ public class CustomGlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponseDto> handleConstraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolationException(
+            ConstraintViolationException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponseDto error = new ErrorResponseDto(
                 LocalDateTime.now(),
