@@ -1,10 +1,10 @@
 package mate.academy.app.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import mate.academy.app.dto.request.UserRegistrationRequestDto;
 import mate.academy.app.dto.response.UserRegistrationResponseDto;
+import mate.academy.app.exception.EntityNotFoundException;
 import mate.academy.app.exception.RegistrationException;
 import mate.academy.app.mapper.UserMapper;
 import mate.academy.app.model.Role;

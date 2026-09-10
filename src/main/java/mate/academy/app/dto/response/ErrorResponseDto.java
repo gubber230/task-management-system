@@ -2,7 +2,7 @@ package mate.academy.app.dto.response;
 
 import java.time.LocalDateTime;
 
-public record ErrorResponse(
+public record ErrorResponseDto(
         LocalDateTime timestamp,
         int status,
         String error,

@@ -43,6 +43,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public void delete(Long labelId) {
+
         labelRepository.deleteById(labelId);
     }
 }

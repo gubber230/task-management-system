@@ -21,12 +21,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponseDto create(CommentCreateRequestDto requestDto) {
+        taskService.checkTaskAccessPermission(requestDto.taskId(), requestDto.userId());
         Comment model = commentMapper.toModel(requestDto);
         return commentMapper.toDto(model);
     }
 
     @Override
-    public Page<CommentResponseDto> getAllByTaskId(Long taskId, Pageable pageable) {
+    public Page<CommentResponseDto> getAllByTaskId(Long taskId, Long userId, Pageable pageable) {
+        taskService.checkTaskAccessPermission(taskId, userId);
         return commentRepository.findAllByTaskId(taskId, pageable)
                 .map(commentMapper::toDto);
     }

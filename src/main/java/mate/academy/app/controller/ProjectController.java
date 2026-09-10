@@ -54,7 +54,7 @@ public class ProjectController {
     @Operation(summary = "Get user project by id")
     public ProjectResponseDto getProjects(
             @AuthenticationPrincipal User user,
-            @PathVariable @Min(0) Long projectId) {
+            @PathVariable("id") @Min(0) Long projectId) {
         return projectService.findById(projectId, user.getId());
     }
 
@@ -62,7 +62,7 @@ public class ProjectController {
     @Operation(summary = "Update projects name or description")
     public void updateProject(
             @AuthenticationPrincipal User user,
-            @PathVariable @Min(0) Long projectId,
+            @PathVariable("id") @Min(0) Long projectId,
             @RequestBody @Valid ProjectUpdateRequestDto updateRequestDto
     ) {
         projectService.update(projectId, updateRequestDto, user.getId());
@@ -72,7 +72,7 @@ public class ProjectController {
     @Operation(summary = "Delete user project")
     public void deleteProject(
             @AuthenticationPrincipal User user,
-            @PathVariable @Min(0) Long projectId
+            @PathVariable("id") @Min(0) Long projectId
     ) {
         projectService.delete(projectId, user.getId());
     }

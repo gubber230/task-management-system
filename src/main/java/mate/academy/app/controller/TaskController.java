@@ -48,13 +48,13 @@ public class TaskController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get task by id")
-    TaskResponseDto getTask(@PathVariable @Min(0) Long taskId, @AuthenticationPrincipal User user) {
+    TaskResponseDto getTask(@PathVariable("id") @Min(0) Long taskId, @AuthenticationPrincipal User user) {
         return taskService.findById(taskId, user.getId());
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update task")
-    void updateTask(@PathVariable @Min(0) Long taskId,
+    void updateTask(@PathVariable("id") @Min(0) Long taskId,
                     @RequestBody @Valid TaskUpdateRequestDto updateRequestDto,
                     @AuthenticationPrincipal User user) {
         taskService.update(taskId, updateRequestDto, user.getId());
@@ -62,8 +62,8 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete task")
-    void deleteTask(@PathVariable @Min(0) Long id, @AuthenticationPrincipal User user) {
-        taskService.delete(id, user.getId());
+    void deleteTask(@PathVariable("id") @Min(0) Long id, @AuthenticationPrincipal User user) {
+        taskService.deleteById(id, user.getId());
     }
 
     @GetMapping("/search")

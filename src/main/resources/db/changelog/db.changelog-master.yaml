@@ -21,5 +21,3 @@ databaseChangeLog:
       file: db/changelog/changes/10-create-labels-table.yaml
   - include:
       file: db/changelog/changes/11-create-tasks-labels-table.yaml
-  - include:
-      file: db/changelog/changes/12-insert-default-users-table.yaml

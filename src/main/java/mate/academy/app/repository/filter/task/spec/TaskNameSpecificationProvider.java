@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NameSpecificationProvider
+public class TaskNameSpecificationProvider
         implements SpecificationProvider<Task, TaskSearchParameters> {
     @Override
     public String getKey() {
