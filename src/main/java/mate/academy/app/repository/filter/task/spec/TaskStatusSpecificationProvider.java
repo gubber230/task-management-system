@@ -1,24 +1,23 @@
-package mate.academy.app.repository.filter.project.spec;
+package mate.academy.app.repository.filter.task.spec;
 
 import java.util.Arrays;
-import mate.academy.app.dto.internal.ProjectSearchParameters;
-import mate.academy.app.model.Project;
+import mate.academy.app.dto.internal.TaskSearchParameters;
+import mate.academy.app.model.Task;
 import mate.academy.app.repository.filter.SpecificationProvider;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StatusSpecificationProvider
-        implements SpecificationProvider<Project, ProjectSearchParameters> {
+public class TaskStatusSpecificationProvider
+        implements SpecificationProvider<Task, TaskSearchParameters> {
     @Override
     public String getKey() {
         return "status";
     }
 
     @Override
-    public Specification<Project> getSpecification(ProjectSearchParameters param) {
+    public Specification<Task> getSpecification(TaskSearchParameters param) {
         return (root, query, criteriaBuilder)
                 -> root.get("status").in(Arrays.asList(param.getStatuses()));
     }
 }
-

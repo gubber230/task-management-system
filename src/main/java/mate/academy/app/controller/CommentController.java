@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mate.academy.app.dto.request.CommentCreateRequestDto;
 import mate.academy.app.dto.response.CommentResponseDto;
+import mate.academy.app.model.User;
 import mate.academy.app.service.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +33,9 @@ public class CommentController {
     @GetMapping
     Page<CommentResponseDto> getComments(
             @RequestParam("taskId") Long taskId,
+            @AuthenticationPrincipal User user,
             Pageable pageable
     ) {
-        return commentService.getAllByTaskId(taskId, pageable);
+        return commentService.getAllByTaskId(taskId, user.getId(), pageable);
     }
 }

@@ -7,6 +7,7 @@ import mate.academy.app.dto.internal.TaskSearchParameters;
 import mate.academy.app.dto.request.TaskCreateRequestDto;
 import mate.academy.app.dto.request.TaskUpdateRequestDto;
 import mate.academy.app.dto.response.TaskResponseDto;
+import mate.academy.app.event.TaskAssignedEvent;
 import mate.academy.app.exception.EntityNotFoundException;
 import mate.academy.app.mapper.LabelMapper;
 import mate.academy.app.mapper.TaskMapper;
@@ -16,6 +17,7 @@ import mate.academy.app.repository.TaskRepository;
 import mate.academy.app.repository.filter.task.TaskSpecificationBuilder;
 import mate.academy.app.service.ProjectService;
 import mate.academy.app.service.TaskService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,11 +33,16 @@ public class TaskServiceImpl implements TaskService {
     private final TaskSpecificationBuilder specificationBuilder;
     private final LabelMapper labelMapper;
     private final LabelRepository labelRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public TaskResponseDto create(TaskCreateRequestDto requestDto, Long ownerId) {
         projectService.checkProjectOwnerPermission(requestDto.projectId(), ownerId);
         Task savedTask = taskRepository.save(taskMapper.toModel(requestDto, labelRepository));
+        eventPublisher.publishEvent(new TaskAssignedEvent(
+                savedTask.getAssigneeId(),
+                savedTask.getName(),
+                savedTask.getDescription()));
         return taskMapper.toDto(savedTask, labelMapper);
     }
 
@@ -56,15 +63,20 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void update(Long taskId, TaskUpdateRequestDto updateDto, Long userId) {
-        Task oldTask = taskRepository.findById(taskId)
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Task with ID " + taskId + " does not exist"
                 ));
-        taskMapper.update(oldTask, updateDto, labelRepository);
+        projectService.checkProjectAccessPermission(task.getProjectId(), userId);
+        taskMapper.update(task, updateDto, labelRepository);
+        eventPublisher.publishEvent(new TaskAssignedEvent(
+                task.getAssigneeId(),
+                task.getName(),
+                task.getDescription()));
     }
 
     @Override
-    public void delete(Long taskId, Long userId) {
+    public void deleteById(Long taskId, Long userId) {
         Task taskToDelete = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Task with ID " + taskId + " does not exist"
@@ -75,6 +87,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> search(TaskSearchParameters searchParameters, Long userId) {
+        searchParameters.setUserId(userId);
         Specification<Task> specification = specificationBuilder.build(searchParameters);
         return taskRepository.findAll(specification)
                 .stream()

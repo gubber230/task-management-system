@@ -8,5 +8,5 @@ import org.springframework.data.domain.Pageable;
 public interface CommentService {
     CommentResponseDto create(CommentCreateRequestDto requestDto);
 
-    Page<CommentResponseDto> getAllByTaskId(Long taskId, Pageable pageable);
+    Page<CommentResponseDto> getAllByTaskId(Long taskId, Long userId, Pageable pageable);
 }

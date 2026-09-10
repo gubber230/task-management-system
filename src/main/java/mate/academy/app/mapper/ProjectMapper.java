@@ -22,9 +22,9 @@ public interface ProjectMapper {
     @Mapping(target = "startDate", expression = "java(java.time.LocalDate.now())")
     @Mapping(target = "status", constant = "INITIATED")
     @Mapping(source = "requestDto.userIds", target = "users", qualifiedByName = "toUsers")
-    Project toModel(
-            ProjectCreateRequestDto requestDto, Long ownerId,
-            @Context UserRepository userRepository);
+    Project toModel(ProjectCreateRequestDto requestDto,
+                    Long ownerId,
+                    @Context UserRepository userRepository);
 
     @Mapping(target = "userIds", source = "users", qualifiedByName = "toUserIds")
     ProjectResponseDto toDto(Project project);
