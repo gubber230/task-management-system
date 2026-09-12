@@ -83,7 +83,7 @@ class UserServiceImplTest {
         when(userRepository.existsByUsername(requestDto.username())).thenReturn(false);
         when(userMapper.toEntity(requestDto)).thenReturn(user);
         when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
-        when(roleRepository.findByRole(UserServiceImpl.ROLE_NAME)).thenReturn(Optional.of(role));
+        when(roleRepository.findByRole(Role.RoleName.USER)).thenReturn(Optional.of(role));
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponseDto(user)).thenReturn(responseDto);
 
@@ -122,7 +122,7 @@ class UserServiceImplTest {
         when(userRepository.existsByUsername(requestDto.username())).thenReturn(false);
         when(userMapper.toEntity(requestDto)).thenReturn(user);
         when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
-        when(roleRepository.findByRole(UserServiceImpl.ROLE_NAME)).thenReturn(Optional.empty());
+        when(roleRepository.findByRole(Role.RoleName.USER)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> userService.register(requestDto));
 
