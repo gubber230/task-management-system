@@ -17,9 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import mate.academy.app.model.enums.TaskPriority;
 import mate.academy.app.model.enums.TaskStatus;
 
@@ -27,9 +25,7 @@ import mate.academy.app.model.enums.TaskStatus;
 @Table(name = "tasks")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +44,6 @@ public class Task {
     private Long projectId;
     @Column(nullable = false)
     private Long assigneeId;
-    @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
