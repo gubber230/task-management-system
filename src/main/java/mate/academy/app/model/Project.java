@@ -17,17 +17,13 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import mate.academy.app.model.enums.ProjectStatus;
 
 @Entity
 @Table(name = "projects")
 @Getter
 @Setter
-@NoArgsConstructor
-@ToString(exclude = {"users"})
 @EqualsAndHashCode(exclude = {"users"})
 public class Project {
     @Id

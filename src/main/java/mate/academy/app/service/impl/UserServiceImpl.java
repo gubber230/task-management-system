@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    public static final Role.RoleName ROLE_NAME = Role.RoleName.USER;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -36,9 +35,9 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toEntity(requestDto);
         user.setPassword(passwordEncoder.encode(requestDto.password()));
-        Role userRole = roleRepository.findByRole(ROLE_NAME)
+        Role userRole = roleRepository.findByRole(Role.RoleName.USER)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Can not find role in database: " + ROLE_NAME));
+                        "Can not find role in database: " + Role.RoleName.USER));
         user.setRoles(Set.of(userRole));
         return userMapper.toResponseDto(userRepository.save(user));
     }
