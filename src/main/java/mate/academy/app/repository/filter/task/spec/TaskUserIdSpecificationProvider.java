@@ -17,6 +17,6 @@ public class TaskUserIdSpecificationProvider
     @Override
     public Specification<Task> getSpecification(TaskSearchParameters param) {
         return (root, query, criteriaBuilder)
-                -> criteriaBuilder.equal(root.get("user").get("id"), param.getUserId());
+                -> criteriaBuilder.equal(root.get("assigneeId"), param.getUserId());
     }
 }

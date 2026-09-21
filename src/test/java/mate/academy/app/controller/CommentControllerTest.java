@@ -1,19 +1,14 @@
 package mate.academy.app.controller;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import mate.academy.app.dto.request.CommentCreateRequestDto;
-import mate.academy.app.dto.response.CommentResponseDto;
 import mate.academy.app.model.User;
-import mate.academy.app.security.JwtUtil;
-import mate.academy.app.service.CommentService;
 import mate.academy.app.service.FileStorageService;
 import mate.academy.app.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,71 +16,81 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@Sql(scripts = "/sql/comment/insert-comment-controller-data.sql",
+        executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/sql/comment/cleanup-comment-controller-data.sql",
+        executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class CommentControllerTest {
 
+    private final Long taskId = 501L;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockitoBean
-    private CommentService commentService;
-    @MockitoBean
-    private JwtUtil jwtUtil;
     @MockitoBean
     private FileStorageService storageService;
     @MockitoBean
     private NotificationService notificationService;
-
-    private User user;
-    private final Long taskId = 1L;
-    private final Long userId = 2L;
+    private User member;
+    private User outsider;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(userId);
+        member = new User();
+        member.setId(502L);
+        outsider = new User();
+        outsider.setId(503L);
     }
 
     @Test
     void createComment_ValidRequest_ReturnsCommentResponseDto() throws Exception {
-        CommentCreateRequestDto requestDto = new CommentCreateRequestDto(taskId, userId, "Test comment");
-        CommentResponseDto responseDto = new CommentResponseDto(
-                1L, taskId, userId, "Test comment", LocalDateTime.now());
-
-        when(commentService.create(requestDto)).thenReturn(responseDto);
+        CommentCreateRequestDto requestDto = new CommentCreateRequestDto(taskId, 502L, "New comment");
 
         mockMvc.perform(post("/comments")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(user(user))
+                        .with(user(member))
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value("New comment"))
+                .andExpect(jsonPath("$.taskId").value(501))
+                .andExpect(jsonPath("$.userId").value(502));
+    }
+
+    @Test
+    void createComment_UserLacksTaskAccess_ReturnsForbidden() throws Exception {
+        CommentCreateRequestDto requestDto = new CommentCreateRequestDto(taskId, 503L, "New comment");
+
+        mockMvc.perform(post("/comments")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .with(user(member))
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void getComments_ValidTaskId_ReturnsPageOfComments() throws Exception {
-        CommentResponseDto responseDto = new CommentResponseDto(
-                1L, taskId, userId, "Test comment", LocalDateTime.now());
-        Page<CommentResponseDto> page = new PageImpl<>(List.of(responseDto));
-
-        when(commentService.getAllByTaskId(
-                        org.mockito.ArgumentMatchers.eq(taskId),
-                        org.mockito.ArgumentMatchers.eq(userId),
-                        org.mockito.ArgumentMatchers.any()))
-                .thenReturn(page);
-
         mockMvc.perform(get("/comments")
                         .param("taskId", taskId.toString())
-                        .with(user(user)))
-                .andExpect(status().isOk());
+                        .with(user(member)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].text").value("Existing comment"));
+    }
+
+    @Test
+    void getComments_UserLacksTaskAccess_ReturnsForbidden() throws Exception {
+        mockMvc.perform(get("/comments")
+                        .param("taskId", taskId.toString())
+                        .with(user(outsider)))
+                .andExpect(status().isForbidden());
     }
 }
