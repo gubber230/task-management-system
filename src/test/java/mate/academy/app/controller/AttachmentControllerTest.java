@@ -2,6 +2,7 @@ package mate.academy.app.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -13,12 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import mate.academy.app.dto.response.AttachmentResponseDto;
-import mate.academy.app.exception.EntityNotFoundException;
 import mate.academy.app.model.User;
-import mate.academy.app.security.JwtUtil;
-import mate.academy.app.service.AttachmentService;
 import mate.academy.app.service.FileStorageService;
 import mate.academy.app.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,73 +24,85 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@Sql(scripts = "/sql/attachment/insert-attachment-controller-data.sql",
+        executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/sql/attachment/cleanup-attachment-controller-data.sql",
+        executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AttachmentControllerTest {
 
+    private final Long taskId = 601L;
+    private final Long taskWithoutAttachmentId = 602L;
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private AttachmentService attachmentService;
-    @MockitoBean
-    private JwtUtil jwtUtil;
     @MockitoBean
     private FileStorageService storageService;
     @MockitoBean
     private NotificationService notificationService;
-
-    private User user;
-    private final Long taskId = 1L;
-    private final Long userId = 2L;
+    private User owner;
+    private User outsider;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(userId);
+        owner = new User();
+        owner.setId(601L);
+        outsider = new User();
+        outsider.setId(602L);
     }
 
     @Test
     void uploadAttachments_ValidRequest_ReturnsDto() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.txt", "text/plain", "test data".getBytes());
-        AttachmentResponseDto responseDto = new AttachmentResponseDto(
-                1L, taskId, "id:123456", "test.txt", LocalDateTime.now());
 
-        when(attachmentService.uploadAttachment(eq(taskId), any(), eq(userId)))
-                .thenReturn(responseDto);
+        when(storageService.upload(eq("/tasks/601/test.txt"), any(InputStream.class)))
+                .thenReturn("id:new-attachment");
 
         mockMvc.perform(multipart("/attachments")
                         .file(file)
                         .param("taskId", taskId.toString())
-                        .with(user(user))
+                        .with(user(owner))
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fileName").value("test.txt"));
     }
 
     @Test
+    void uploadAttachments_UserLacksTaskAccess_ReturnsForbidden() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "test.txt", "text/plain", "test data".getBytes());
+
+        mockMvc.perform(multipart("/attachments")
+                        .file(file)
+                        .param("taskId", taskId.toString())
+                        .with(user(outsider))
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(storageService);
+    }
+
+    @Test
     void downloadAttachments_ValidRequest_ReturnsFileContent() throws Exception {
         InputStream stream = new ByteArrayInputStream("file content".getBytes());
-
-        when(attachmentService.downloadAttachment(taskId, userId)).thenReturn(stream);
+        when(storageService.download("dbx-601")).thenReturn(stream);
 
         mockMvc.perform(get("/attachments")
                         .param("taskId", taskId.toString())
-                        .with(user(user)))
+                        .with(user(owner)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void downloadAttachments_AttachmentNotFound_ReturnsNotFound() throws Exception {
-        when(attachmentService.downloadAttachment(taskId, userId))
-                .thenThrow(new EntityNotFoundException("Attachment not found"));
-
         mockMvc.perform(get("/attachments")
-                        .param("taskId", taskId.toString())
-                        .with(user(user)))
+                        .param("taskId", taskWithoutAttachmentId.toString())
+                        .with(user(owner)))
                 .andExpect(status().isNotFound());
     }
 
@@ -102,7 +110,7 @@ class AttachmentControllerTest {
     void deleteAttachments_ValidRequest_ReturnsOk() throws Exception {
         mockMvc.perform(delete("/attachments")
                         .param("taskId", taskId.toString())
-                        .with(user(user))
+                        .with(user(owner))
                         .with(csrf()))
                 .andExpect(status().isOk());
     }
